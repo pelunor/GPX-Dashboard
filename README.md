@@ -1,54 +1,97 @@
 # Activity Dashboard
 
-A private dashboard for your Strava export, or any `.gpx` / `.fit` files: a heatmap of everywhere you've been, speed and gradient maps, personal records, key stats and every activity with its route, elevation, pace and heart rate.
+See everywhere you've run, ridden, hiked or swum: a heatmap of your routes, your personal records, and every activity with its map, elevation, pace and heart rate.
 
-**Your data never leaves your browser.** The site is just static files. When you load your activities they're read and processed on your own device, and nothing is uploaded.
+## **→ [Open the dashboard](https://pelunor.github.io/activity-dashboard/)**
 
-## Features
+Free, no account, no sign-up. **Your data never leaves your device:** the website reads your files inside your own browser and uploads nothing.
 
-- **Load anything:** drop in the Strava export `.zip` as is, its folder, or loose `.gpx`, `.fit`, `.gpx.gz` and `.fit.gz` files. Drag and drop works too.
-- **Key stats:** activities, distance, moving time, elevation gain, longest activity and biggest climb.
-- **Maps:** heatmap (how often you've passed each street), speed, gradient, and all routes coloured by sport (click one to open it).
-- **Personal records per sport:** longest distance, longest time, biggest climb, fastest average.
-- **Filters:** by sport, by year or by a custom date range. Everything updates together.
-- **Activity table:** sortable and searchable. Click a row for its route map and elevation, pace/speed and heart-rate profiles.
-- **Remembers your data in this browser**, so you don't reload files on every visit. *Clear data* wipes it.
-- Works on phones, with light and dark mode.
+---
 
-## Get your data from Strava
+## How to use it
 
-1. On strava.com: **Settings → My Account → Download or Delete Your Account → Get started → Request your archive**.
-2. Strava emails you a link to a `.zip` (it can take a few hours).
-3. Open the dashboard and drop the `.zip` in. No need to unzip it.
+### 1. Download your data from Strava
 
-When the export includes Strava's `activities.csv`, the dashboard uses its activity names, sport types and Strava's own distance and time figures, so totals match what you see on Strava. Activities without a GPS file, such as gym sessions, still count in the stats.
+1. Go to [strava.com](https://www.strava.com) on a computer and log in.
+2. Click your profile picture → **Settings** → **My Account**.
+3. At the bottom, under **Download or Delete Your Account**, click **Get started**.
+4. Under **Download Request**, click **Request your archive**.
+5. Strava emails you a download link. It usually takes from a few minutes to a few hours. Download the `.zip` file.
 
-## Privacy
+### 2. Load it into the dashboard
 
-- No server, no accounts, no analytics, no cookies.
-- The page's Content-Security-Policy sets `connect-src 'none'` and `form-action 'none'`, so the browser itself prevents the page from sending your data anywhere. The only network requests are for the page's code (Leaflet, Plotly and fflate from public CDNs, pinned with integrity hashes) and the map tiles (Esri, OpenStreetMap).
-- From a Strava export, only `activities.csv` and the activity files are read. Your profile, followers, messages and photos are ignored.
-- Parsed data is stored in your browser's IndexedDB, on your device only.
-- `.gitignore` excludes activity files and exports, so you can keep your data next to the code without committing it.
+1. Open **[pelunor.github.io/activity-dashboard](https://pelunor.github.io/activity-dashboard/)**.
+2. Drag the `.zip` onto the page, or click **Choose .zip or files** and select it. **No need to unzip it.**
+3. Wait a few seconds to a minute while your activities are read. That's it.
 
-## Run it locally
+Next time you open the dashboard on the same browser, your activities are still there. To add new ones later, download a fresh export (or just the new activities' files) and use **Add files**.
 
-Any static file server works. With Python:
+### Not on Strava?
+
+Export `.gpx` or `.fit` files from Garmin Connect, Wahoo, Coros, Komoot, etc. and drop them in. Several files at once, or a whole folder, works too.
+
+---
+
+## What you get
+
+| | |
+|---|---|
+| **Key stats** | Number of activities, total distance, moving time, elevation gain, your longest activity and your biggest climb |
+| **Heatmap** | Every route you've done. The brighter the line, the more often you've been there |
+| **Speed and gradient maps** | Where you go fast, and where you climb and descend |
+| **Routes map** | All activities coloured by sport. Click one to open it |
+| **Personal records** | For each sport: longest distance, longest time, biggest climb, fastest average pace or speed |
+| **Filters** | Show only some sports, a year, or any date range. Everything updates together |
+| **Activity list** | Sort and search all your activities. Click one for its route, elevation, pace/speed and heart-rate charts |
+
+Works on computers and phones, in light and dark mode.
+
+---
+
+## Privacy: is my data safe?
+
+**Yes. Nobody but you can see your activities, including the person who made this site.**
+
+- There is no server and no database. The website is just a page, and your files are opened and processed **by your own browser, on your own device**.
+- The page is technically locked so that it **cannot send data anywhere**: its security policy (`connect-src 'none'`) forbids it, and your browser enforces this. The only things it downloads are its own code and the map background images.
+- Of everything in your Strava export, it only reads `activities.csv` and the activity files. Your profile, followers, messages and photos are ignored.
+- Your activities are saved **only in your browser**, so they're there next time. Click **Clear data** at the top of the dashboard to delete them. Your original files are never changed.
+- No accounts, no cookies, no analytics, no tracking.
+
+**One thing to keep in mind:** the maps show exactly where you've been, including where your activities start and end, which is often home. Think twice before sharing a screenshot.
+
+---
+
+## Questions
+
+**It's slow or my browser froze for a moment.**
+A few hundred activities take up to a minute to read the first time. After that the dashboard opens instantly.
+
+**Some activities have no map.**
+Indoor activities (treadmill, home trainer, gym, pool) have no GPS. They still count in your stats and records.
+
+**My totals are slightly different from Strava's.**
+With a Strava export, the dashboard uses Strava's own distance and time figures, so they should match. With loose `.gpx` / `.fit` files it calculates them itself, which can differ a little.
+
+**Does it work in my language?**
+The interface is in English. Dates and numbers follow your browser's language. Activity names and sport types are read from Strava exports in English. With other languages the maps and stats still work, but names may show as the sport type.
+
+**Can I use it on my phone?**
+Yes. Loading a big Strava export is easier on a computer, though, because of the file size.
+
+---
+
+## For developers
+
+The site is static: HTML, CSS and JavaScript modules with no build step. Libraries (Leaflet, Plotly, fflate) load from public CDNs, pinned with integrity hashes.
+
+Run it locally with any static server, for example:
 
 ```bash
 python -m http.server 8000
 ```
 
 Then open <http://localhost:8000>. Opening `index.html` directly from disk doesn't work, because browsers block JavaScript modules on `file://`.
-
-## Host it on GitHub Pages
-
-1. Create a new **empty** repository on GitHub (no README, no licence).
-2. Push this folder to it (see the commands GitHub shows for "push an existing repository").
-3. In the repository, go to **Settings → Pages → Build and deployment**, choose **Deploy from a branch**, then branch `main` and folder `/ (root)`, and save.
-4. After a minute the site is live at `https://<your-username>.github.io/<repository-name>/`.
-
-## Project layout
 
 ```
 index.html        page structure + Content-Security-Policy
@@ -62,4 +105,6 @@ js/charts.js      Plotly profile charts
 js/store.js       IndexedDB persistence
 ```
 
-No build step: edit the files and reload.
+Hosting: GitHub Pages, **Settings → Pages → Deploy from a branch → `main` / root**. `.gitignore` excludes activity files and exports, so you can keep your own data in the folder without committing it.
+
+Not affiliated with Strava.

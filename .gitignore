@@ -1,0 +1,14 @@
+# Never commit or share your own activity data or anything derived from it
+strava_files/
+export_*/
+activities/
+output/
+*.zip
+*.gpx
+*.fit
+*.gz
+*.tcx
+*.csv
+__pycache__/
+.DS_Store
+Thumbs.db

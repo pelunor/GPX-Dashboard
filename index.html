@@ -1,0 +1,174 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <!-- Privacy guarantee: the page may load its code and map tiles, but it is
+       not allowed to send data anywhere (connect-src 'none', form-action 'none'). -->
+  <meta http-equiv="Content-Security-Policy" content="default-src 'self'; script-src 'self' https://cdnjs.cloudflare.com https://cdn.jsdelivr.net; style-src 'self' 'unsafe-inline' https://cdnjs.cloudflare.com; img-src 'self' data: https://server.arcgisonline.com https://tile.openstreetmap.org https://cdnjs.cloudflare.com; connect-src 'none'; font-src 'self'; object-src 'none'; base-uri 'none'; form-action 'none'">
+  <meta name="referrer" content="strict-origin-when-cross-origin">
+  <meta name="description" content="Private, in-browser dashboard for your Strava export or GPX/FIT files: heatmap, routes, records and stats. Nothing is uploaded.">
+  <title>Activity Dashboard</title>
+  <link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32'%3E%3Crect width='32' height='32' rx='7' fill='%23d95926'/%3E%3Cpath d='M6 22c4-1 5-9 9-9s4 6 7 6 3-5 4-7' stroke='white' stroke-width='3' fill='none' stroke-linecap='round'/%3E%3C/svg%3E">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/leaflet/1.9.4/leaflet.min.css"
+        integrity="sha384-c6Rcwz4e4CITMbu/NBmnNS8yN2sC3cUElMEMfP3vqqKFp7GOYaaBBCqmaWBjmkjb" crossorigin="anonymous">
+  <link rel="stylesheet" href="css/style.css">
+  <script defer src="https://cdnjs.cloudflare.com/ajax/libs/leaflet/1.9.4/leaflet.min.js"
+          integrity="sha384-NElt3Op+9NBMCYaef5HxeJmU4Xeard/Lku8ek6hoPTvYkQPh3zLIrJP7KiRocsxO" crossorigin="anonymous"></script>
+  <script defer src="https://cdn.jsdelivr.net/npm/plotly.js-basic-dist-min@2.35.2/plotly-basic.min.js"
+          integrity="sha384-wQ3lfCxuvLfhHGiSdHF5+e3NZ1zNwEMd8/nII+K7VKChF9llO/OwOcn/aVRkB7az" crossorigin="anonymous"></script>
+  <script defer src="https://cdn.jsdelivr.net/npm/fflate@0.8.2/umd/index.js"
+          integrity="sha384-DT0Ls0mO7JmjTnT+oBuMhEJzYJO1zUqzuuMXNdnOmOQRIpN2BgSjvBV/j50NngIT" crossorigin="anonymous"></script>
+  <script type="module" src="js/app.js"></script>
+</head>
+<body>
+  <header class="topbar">
+    <div class="brand">
+      <svg viewBox="0 0 32 32" aria-hidden="true"><rect width="32" height="32" rx="7"/><path d="M6 22c4-1 5-9 9-9s4 6 7 6 3-5 4-7"/></svg>
+      <span>Activity Dashboard</span>
+    </div>
+    <p class="privacy-pill" title="Your files are processed in this browser. Nothing is uploaded.">
+      <svg viewBox="0 0 16 16" aria-hidden="true"><path d="M4 7V5a4 4 0 0 1 8 0v2h1v8H3V7zm2 0h4V5a2 2 0 0 0-4 0z"/></svg>
+      Private · stays on your device
+    </p>
+    <div class="topbar__actions">
+      <button type="button" class="btn js-has-data js-pick-files" hidden>Add files</button>
+      <button type="button" class="btn js-has-data js-pick-folder" hidden>Add folder</button>
+      <button type="button" class="btn btn--ghost js-has-data" id="btn-clear" hidden>Clear data</button>
+    </div>
+  </header>
+
+  <input type="file" id="in-files" multiple accept=".zip,.gpx,.fit,.gz,.csv" hidden>
+  <input type="file" id="in-folder" webkitdirectory multiple hidden>
+
+  <!-- ============ EMPTY STATE ============ -->
+  <main id="welcome" class="welcome">
+    <section class="welcome__hero">
+      <h1>See everywhere you've been.</h1>
+      <p class="lede">A heatmap of your routes, your personal records and every activity in one place. Load your Strava export or any .gpx / .fit files. They're read <strong>inside this browser</strong> and never uploaded.</p>
+      <div class="dropzone">
+        <p class="dropzone__title">Drop your Strava export (.zip or folder) or activity files here</p>
+        <div class="dropzone__buttons">
+          <button type="button" class="btn btn--primary js-pick-files">Choose .zip or files</button>
+          <button type="button" class="btn js-pick-folder">Choose folder</button>
+        </div>
+        <p class="dropzone__hint">Supports .gpx, .fit, .gpx.gz, .fit.gz and Strava's activities.csv</p>
+      </div>
+    </section>
+
+    <section class="welcome__info">
+      <article>
+        <h2>Get your data from Strava</h2>
+        <ol>
+          <li>On strava.com open <strong>Settings → My Account</strong>.</li>
+          <li>Under <em>Download or Delete Your Account</em>, choose <strong>Get started → Request your archive</strong>.</li>
+          <li>You'll get an email with a .zip (it can take a few hours). Drop that zip here as is. No need to unzip.</li>
+        </ol>
+        <p class="muted">Garmin, Wahoo, Coros and others: export .fit or .gpx files and drop them in.</p>
+      </article>
+      <article>
+        <h2>Your data stays yours</h2>
+        <ul>
+          <li>Files are processed by this page in your browser. There is no server and no upload.</li>
+          <li>The page's security policy blocks it from sending data anywhere. Only map tiles and the page's code are downloaded.</li>
+          <li>From a Strava export only <code>activities.csv</code> and the activity files are read. Profile, followers, messages and photos are ignored.</li>
+          <li>Results are remembered in this browser only. <strong>Clear data</strong> wipes them.</li>
+        </ul>
+      </article>
+    </section>
+  </main>
+
+  <!-- ============ DASHBOARD ============ -->
+  <main id="dashboard" class="dashboard" hidden>
+    <section class="filters" aria-label="Filters">
+      <div class="filters__sports" id="f-sports" role="group" aria-label="Sports"></div>
+      <div class="filters__dates">
+        <label class="field">
+          <span class="sr-only">Period</span>
+          <select id="f-year"></select>
+        </label>
+        <label class="field"><span>From</span><input type="date" id="f-from"></label>
+        <label class="field"><span>To</span><input type="date" id="f-to"></label>
+        <button type="button" class="btn btn--ghost btn--small" id="f-reset" hidden>Reset filters</button>
+        <span class="filters__count" id="f-count" aria-live="polite"></span>
+      </div>
+    </section>
+
+    <section class="kpis" id="kpis" aria-label="Key stats"></section>
+
+    <section class="row">
+      <div class="card card--map">
+        <div class="card__head">
+          <h2>Map</h2>
+          <div class="segmented" role="group" aria-label="Map view">
+            <button type="button" data-map-mode="heat">Heatmap</button>
+            <button type="button" data-map-mode="speed">Speed</button>
+            <button type="button" data-map-mode="slope">Gradient</button>
+            <button type="button" data-map-mode="routes">Routes</button>
+          </div>
+          <button type="button" class="btn btn--ghost btn--small" id="map-fit">Show all</button>
+        </div>
+        <div id="map" class="map"></div>
+      </div>
+      <div class="card">
+        <div class="card__head"><h2>Time by sport</h2></div>
+        <ul class="bars" id="breakdown"></ul>
+      </div>
+    </section>
+
+    <section class="card">
+      <div class="card__head"><h2>Personal records</h2></div>
+      <div class="records" id="records"></div>
+    </section>
+
+    <section class="card">
+      <div class="card__head">
+        <h2>Activities</h2>
+        <label class="field field--search">
+          <span class="sr-only">Search activities</span>
+          <input type="search" id="t-search" placeholder="Search by name or sport">
+        </label>
+      </div>
+      <div class="table-wrap">
+        <table class="table">
+          <thead><tr id="t-head"></tr></thead>
+          <tbody id="t-body"></tbody>
+        </table>
+      </div>
+      <div class="table-foot">
+        <span id="t-status" class="muted"></span>
+        <button type="button" class="btn btn--small" id="t-more" hidden>Show more</button>
+      </div>
+    </section>
+  </main>
+
+  <footer class="footer">
+    <p>Everything runs in your browser. No uploads, no accounts, no analytics, no cookies.
+      Map tiles &copy; Esri and OpenStreetMap contributors. Not affiliated with Strava.</p>
+  </footer>
+
+  <!-- ============ OVERLAYS ============ -->
+  <dialog id="detail" class="detail" aria-labelledby="d-title">
+    <div class="detail__inner">
+      <header class="detail__head">
+        <div>
+          <p class="detail__meta" id="d-meta"></p>
+          <h2 id="d-title"></h2>
+        </div>
+        <button type="button" class="btn btn--ghost btn--icon" id="d-close" aria-label="Close">✕</button>
+      </header>
+      <dl class="detail__stats" id="d-stats"></dl>
+      <div id="d-map" class="detail__map"></div>
+      <p id="d-note" class="muted">No GPS or sensor file for this activity. The stats come from Strava's activities.csv.</p>
+      <div id="d-charts" class="detail__charts"></div>
+    </div>
+  </dialog>
+
+  <div id="progress" class="progress" role="status" hidden>
+    <p id="progress-text"></p>
+    <progress id="progress-bar" max="1" value="0"></progress>
+  </div>
+  <div id="toast" class="toast" role="status" aria-live="polite" hidden></div>
+  <div class="drop-overlay" aria-hidden="true"><p>Drop to add your activities</p></div>
+</body>
+</html>

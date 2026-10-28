@@ -1,8 +1,8 @@
-# Activity Dashboard
+# GPX Dashboard
 
 See everywhere you've run, ridden, hiked or swum: a heatmap of your routes, your personal records, and every activity with its map, elevation, pace and heart rate.
 
-## **→ [Open the dashboard](https://pelunor.github.io/activity-dashboard/)**
+## **→ [Open the dashboard](https://pelunor.github.io/GPX-Dashboard/)**
 
 Free, no account, no sign-up. **Your data never leaves your device:** the website reads your files inside your own browser and uploads nothing.
 
@@ -20,7 +20,7 @@ Free, no account, no sign-up. **Your data never leaves your device:** the websit
 
 ### 2. Load it into the dashboard
 
-1. Open **[pelunor.github.io/activity-dashboard](https://pelunor.github.io/activity-dashboard/)**.
+1. Open **[pelunor.github.io/GPX-Dashboard](https://pelunor.github.io/GPX-Dashboard/)**.
 2. Drag the `.zip` onto the page, or click **Choose .zip or files** and select it. **No need to unzip it.**
 3. Wait a few seconds to a minute while your activities are read. That's it.
 
